@@ -4,213 +4,441 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>MVS NGO Manager</title>
-  <!-- Tailwind CSS (स्टाइलिंग के लिए) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { -webkit-tap-highlight-color: transparent; }
+    @media print {
+      body * { visibility: hidden; }
+      #printable-receipt, #printable-receipt * { visibility: visible; }
+      #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; border: none !important; box-shadow: none !important; }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 pb-20 font-sans">
+<body class="bg-slate-50 text-slate-800 pb-24 font-sans">
 
-  <!-- Supabase Configuration (यहाँ अपनी डिटेल्स डालें) -->
+  <!-- Supabase Credentials (यहाँ अपनी डिटेल्स डालें) -->
   <script>
     const SUPABASE_URL = "https://jwlxospcgbkpizmdbdxh.supabase.co/rest/v1/";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3bHhvc3BjZ2JrcGl6bWRiZHhoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MzgxNjQxNSwiZXhwIjoyMTA5MzkyNDE1fQ.TJ4HySVvlTYrbhyhsUNcwK1AxSat3StFy6l-VrdJgpo";
+    const SUPABASE_ANON_KEY = "sb_secret_aJzvc_BothqaZoGSh0Pwyw_vDM1fgnf";
     
-    // Supabase क्लाइंट शुरू करना
     let supabaseClient = null;
     if (SUPABASE_URL && SUPABASE_URL !== "YOUR_SUPABASE_URL_HERE") {
       supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
   </script>
 
-  <!-- 1. Header (शीर्ष पट्टी) -->
-  <header class="bg-blue-700 text-white shadow-md sticky top-0 z-40">
+  <!-- शीर्ष पट्टी (Header) -->
+  <header class="bg-blue-700 text-white shadow-md sticky top-0 z-30">
     <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
       <div>
         <h1 class="text-lg font-bold tracking-tight">MVS NGO Manager</h1>
         <p class="text-xs text-blue-100" id="ngo-subtitle">मानव विकास संस्थान</p>
       </div>
-      <!-- भाषा बदलने का बटन -->
-      <button onclick="toggleLanguage()" class="bg-blue-800 border border-blue-400 text-xs px-2.5 py-1.5 rounded-full font-medium flex items-center gap-1 active:bg-blue-900">
+      <button onclick="toggleLanguage()" class="bg-blue-800 border border-blue-400 text-xs px-2.5 py-1.5 rounded-full font-medium active:bg-blue-900">
         🌐 <span id="lang-btn-text">English</span>
       </button>
     </div>
   </header>
 
-  <!-- मुख्य कंटेनर -->
+  <!-- मुख्य पेज कंटेनर -->
   <main class="max-w-md mx-auto px-4 pt-4 space-y-5">
 
-    <!-- 2. क्विक सारांश कार्ड्स (Dashboard Metrics) -->
-    <section>
-      <div class="flex justify-between items-center mb-2.5">
-        <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider" data-hi="संक्षिप्त स्थिति" data-en="Overview">संक्षिप्त स्थिति</h2>
-        <span class="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full" id="db-status">● Live</span>
-      </div>
+    <!-- 1. होम / डैशबोर्ड व्यू (Home View) -->
+    <div id="view-home" class="space-y-5">
+      <!-- समरी कार्ड्स -->
+      <section>
+        <div class="flex justify-between items-center mb-2.5">
+          <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-hi="संक्षिप्त स्थिति" data-en="Overview">संक्षिप्त स्थिति</h2>
+          <span class="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full" id="db-status">● Live</span>
+        </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <!-- कुल दान -->
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs text-slate-500 font-medium" data-hi="कुल दान (प्राप्त)" data-en="Total Donations">कुल दान (प्राप्त)</p>
-          <p class="text-xl font-bold text-blue-700 mt-1" id="stat-donations">₹0</p>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium" data-hi="कुल दान (प्राप्त)" data-en="Total Donations">कुल दान (प्राप्त)</p>
+            <p class="text-xl font-bold text-blue-700 mt-1" id="stat-donations">₹0</p>
+          </div>
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium" data-hi="चालू प्रोजेक्ट्स" data-en="Active Projects">चालू प्रोजेक्ट्स</p>
+            <p class="text-xl font-bold text-slate-800 mt-1" id="stat-projects">0</p>
+          </div>
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium" data-hi="कुल लाभार्थी" data-en="Beneficiaries">कुल लाभार्थी</p>
+            <p class="text-xl font-bold text-emerald-600 mt-1" id="stat-beneficiaries">0</p>
+          </div>
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
+            <p class="text-xs text-slate-500 font-medium" data-hi="कुल खर्च" data-en="Total Expenses">कुल खर्च</p>
+            <p class="text-xl font-bold text-rose-600 mt-1" id="stat-expenses">₹0</p>
+          </div>
         </div>
-        <!-- सक्रिय प्रोजेक्ट्स -->
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs text-slate-500 font-medium" data-hi="चालू प्रोजेक्ट्स" data-en="Active Projects">चालू प्रोजेक्ट्स</p>
-          <p class="text-xl font-bold text-slate-800 mt-1" id="stat-projects">0</p>
-        </div>
-        <!-- कुल लाभार्थी -->
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs text-slate-500 font-medium" data-hi="कुल लाभार्थी" data-en="Beneficiaries">कुल लाभार्थी</p>
-          <p class="text-xl font-bold text-emerald-600 mt-1" id="stat-beneficiaries">0</p>
-        </div>
-        <!-- कुल खर्च -->
-        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm">
-          <p class="text-xs text-slate-500 font-medium" data-hi="कुल खर्च" data-en="Total Expenses">कुल खर्च</p>
-          <p class="text-xl font-bold text-rose-600 mt-1" id="stat-expenses">₹0</p>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 3. क्विक एक्शन बटन (Quick Actions) -->
-    <section class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2.5">
-      <h3 class="text-xs font-semibold text-slate-500 uppercase" data-hi="त्वरित कार्य" data-en="Quick Actions">त्वरित कार्य</h3>
-      <div class="grid grid-cols-2 gap-2 text-sm">
-        <button onclick="alert('दान एंट्री फॉर्म अगले चरण में सक्रिय होगा!')" class="w-full bg-blue-50 text-blue-700 border border-blue-200 py-2.5 px-3 rounded-lg font-medium text-center active:bg-blue-100">
-          + <span data-hi="नया दान जोड़ें" data-en="New Donation">नया दान जोड़ें</span>
+      <!-- क्विक एक्शन बटन -->
+      <section class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-xs font-semibold text-slate-500 uppercase mb-2.5" data-hi="त्वरित कार्य" data-en="Quick Actions">त्वरित कार्य</h3>
+        <button onclick="openDonationModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm text-center flex items-center justify-center gap-2 active:bg-blue-800 text-sm">
+          <span>+</span> <span data-hi="नया दान दर्ज करें (रसीद बनाएं)" data-en="Record New Donation">नया दान दर्ज करें (रसीद बनाएं)</span>
         </button>
-        <button onclick="alert('लाभार्थी फॉर्म अगले चरण में सक्रिय होगा!')" class="w-full bg-emerald-50 text-emerald-700 border border-emerald-200 py-2.5 px-3 rounded-lg font-medium text-center active:bg-emerald-100">
-          + <span data-hi="नया लाभार्थी" data-en="New Beneficiary">नया लाभार्थी</span>
+      </section>
+
+      <!-- प्रोजेक्ट्स की सूची -->
+      <section>
+        <div class="flex justify-between items-center mb-2.5">
+          <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wider" data-hi="संस्था के प्रोजेक्ट्स" data-en="NGO Projects">संस्था के प्रोजेक्ट्स</h2>
+          <button onclick="loadAllData()" class="text-xs text-blue-600 font-medium underline" data-hi="रिफ्रेश" data-en="Refresh">रिफ्रेश</button>
+        </div>
+        <div id="projects-list" class="space-y-2">
+          <div class="text-center text-slate-400 text-xs py-4">लोड हो रहा है...</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 2. दान सूची व्यू (Donations View) -->
+    <div id="view-donations" class="hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-sm font-bold text-slate-700" data-hi="प्राप्त दान रिकॉर्ड्स" data-en="Donation Records">प्राप्त दान रिकॉर्ड्स</h2>
+        <button onclick="openDonationModal()" class="bg-blue-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg active:bg-blue-700">
+          + <span data-hi="नया दान" data-en="Add Donation">नया दान</span>
         </button>
       </div>
-    </section>
-
-    <!-- 4. एक्टिव प्रोजेक्ट्स सूची (Database Preview) -->
-    <section>
-      <div class="flex justify-between items-center mb-2.5">
-        <h2 class="text-sm font-semibold text-slate-600 uppercase tracking-wider" data-hi="संस्था के प्रोजेक्ट्स" data-en="NGO Projects">संस्था के प्रोजेक्ट्स</h2>
-        <button onclick="loadDashboardData()" class="text-xs text-blue-600 underline font-medium" data-hi="रिफ्रेश" data-en="Refresh">रिफ्रेश</button>
+      <div id="donations-list" class="space-y-2.5">
+        <div class="text-center text-slate-400 text-xs py-6">दान रिकॉर्ड लोड हो रहे हैं...</div>
       </div>
-
-      <div id="projects-list" class="space-y-2">
-        <div class="bg-white p-4 rounded-xl border border-slate-200 text-center text-slate-400 text-xs py-6">
-          डेटा लोड हो रहा है...
-        </div>
-      </div>
-    </section>
+    </div>
 
   </main>
 
+  <!-- 3. नया दान जोड़ने का मॉडल / फ़ॉर्म (Donation Modal) -->
+  <div id="donation-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] overflow-y-auto space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base" data-hi="दान प्रविष्टि (Donation Entry)" data-en="New Donation Entry">दान प्रविष्टि (Donation Entry)</h3>
+        <button onclick="closeDonationModal()" class="text-slate-400 text-2xl leading-none">&times;</button>
+      </div>
+
+      <form id="donation-form" onsubmit="handleDonationSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-medium text-slate-700 mb-1" data-hi="डोनर का नाम *" data-en="Donor Full Name *">डोनर का नाम *</label>
+          <input type="text" id="donor-name" required placeholder="उदा. रमेश कुमार" class="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-600 outline-none text-sm">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1" data-hi="मोबाइल नंबर" data-en="Phone Number">मोबाइल नंबर</label>
+            <input type="tel" id="donor-phone" placeholder="WhatsApp नंबर" class="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-600 outline-none text-sm">
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1" data-hi="शहर / पता" data-en="City / Location">शहर / पता</label>
+            <input type="text" id="donor-city" placeholder="उदा. वाराणसी" class="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-600 outline-none text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-medium text-slate-700 mb-1" data-hi="दान राशि (₹) *" data-en="Amount (₹) *">दान राशि (₹) *</label>
+            <input type="number" id="donation-amount" required min="1" placeholder="₹" class="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-600 outline-none text-sm font-bold text-blue-700">
+          </div>
+          <div>
+            <label class="block font-medium text-slate-700 mb-1" data-hi="भुगतान माध्यम" data-en="Payment Mode">भुगतान माध्यम</label>
+            <select id="donation-mode" class="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-600 outline-none text-sm bg-white">
+              <option value="Cash">Cash (नकद)</option>
+              <option value="Direct UPI Transfer">Direct UPI Transfer</option>
+              <option value="Cheque">Cheque (चेक)</option>
+              <option value="Other">Other (अन्य)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1" data-hi="प्रोजेक्ट चुनें *" data-en="Select Project *">प्रोजेक्ट चुनें *</label>
+          <select id="donation-project" required class="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-600 outline-none text-sm bg-white">
+            <option value="">प्रोजेक्ट लोड हो रहे हैं...</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-medium text-slate-700 mb-1" data-hi="UPI Ref / Cheque No. (यदि हो)" data-en="Transaction Ref / Cheque No.">UPI Ref / Cheque No. (यदि हो)</label>
+          <input type="text" id="donation-ref" placeholder="उदा. 40291823901" class="w-full border border-slate-300 rounded-lg p-2.5 focus:border-blue-600 outline-none text-sm">
+        </div>
+
+        <button type="submit" id="submit-btn" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 rounded-xl text-sm shadow-md active:bg-blue-900 mt-2">
+          दान सुरक्षित करें और रसीद बनाएं
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. डोनेशन रसीद स्लिप मॉडल (Receipt Modal) -->
+  <div id="receipt-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-4 shadow-2xl">
+      
+      <!-- प्रिंट होने वाला भाग -->
+      <div id="printable-receipt" class="border border-blue-200 bg-blue-50/30 rounded-xl p-4 text-xs space-y-3">
+        <div class="text-center border-b border-blue-200 pb-2">
+          <h2 class="font-bold text-base text-blue-900">MANAV VIKAS SANSTHAN</h2>
+          <p class="text-[10px] text-slate-500">मानव विकास संस्थान (Regd. NGO)</p>
+          <p class="text-[10px] font-semibold text-blue-700 mt-1">दान प्राप्ति रसीद / DONATION RECEIPT</p>
+        </div>
+
+        <div class="space-y-1">
+          <div class="flex justify-between"><span class="text-slate-500">रसीद संख्या / Receipt:</span> <span class="font-bold" id="rec-id">-</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">दिनांक / Date:</span> <span id="rec-date">-</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">दाता का नाम / Donor:</span> <span class="font-bold text-slate-800" id="rec-name">-</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">प्रोजेक्ट / Project:</span> <span id="rec-project">-</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">माध्यम / Mode:</span> <span id="rec-mode">-</span></div>
+        </div>
+
+        <div class="bg-blue-100/60 p-2.5 rounded-lg flex justify-between items-center border border-blue-200">
+          <span class="font-bold text-slate-700">प्राप्त राशि / Amount:</span>
+          <span class="font-bold text-lg text-blue-800" id="rec-amount">₹0</span>
+        </div>
+
+        <p class="text-[9px] text-center text-slate-400 italic">"शिक्षा एवं महिला सशक्तिकरण में आपके सहयोग हेतु धन्यवाद।"</p>
+      </div>
+
+      <!-- शेयर एवं प्रिंट बटन -->
+      <div class="grid grid-cols-2 gap-2 text-xs">
+        <button onclick="shareOnWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-3 rounded-lg flex items-center justify-center gap-1.5 active:bg-emerald-800">
+          <span>💬</span> WhatsApp भेजें
+        </button>
+        <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 px-3 rounded-lg flex items-center justify-center gap-1.5 active:bg-black">
+          <span>🖨️</span> प्रिंट / PDF
+        </button>
+      </div>
+      
+      <button onclick="closeReceiptModal()" class="w-full text-center text-slate-500 text-xs font-semibold py-1">
+        बंद करें (Close)
+      </button>
+    </div>
+  </div>
+
   <!-- 5. मोबाइल बॉटम नेविगेशन (Bottom Nav) -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 z-40 shadow-lg">
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 z-20 shadow-lg">
     <div class="max-w-md mx-auto px-4 flex justify-around text-center text-xs">
-      <button class="text-blue-700 font-semibold flex flex-col items-center">
+      <button onclick="switchTab('home')" id="tab-home" class="text-blue-700 font-semibold flex flex-col items-center">
         <span class="text-lg">🏠</span>
         <span data-hi="होम" data-en="Home">होम</span>
       </button>
-      <button onclick="alert('यह सेक्शन अगले चरण में खुलेगा')" class="text-slate-500 flex flex-col items-center">
+      <button onclick="switchTab('donations')" id="tab-donations" class="text-slate-500 flex flex-col items-center">
         <span class="text-lg">💰</span>
         <span data-hi="दान" data-en="Donations">दान</span>
       </button>
-      <button onclick="alert('यह सेक्शन अगले चरण में खुलेगा')" class="text-slate-500 flex flex-col items-center">
+      <button onclick="alert('लाभार्थी मॉड्यूल अगले चरण में खुलेगा!')" class="text-slate-400 flex flex-col items-center">
         <span class="text-lg">👥</span>
         <span data-hi="लाभार्थी" data-en="Beneficiaries">लाभार्थी</span>
       </button>
-      <button onclick="alert('यह सेक्शन अगले चरण में खुलेगा')" class="text-slate-500 flex flex-col items-center">
+      <button onclick="alert('खर्च एवं रिपोर्ट मॉड्यूल अगले चरण में खुलेगा!')" class="text-slate-400 flex flex-col items-center">
         <span class="text-lg">📊</span>
         <span data-hi="रिपोर्ट्स" data-en="Reports">रिपोर्ट्स</span>
       </button>
     </div>
   </nav>
 
-  <!-- लॉजिक और डेटा लोड करने की स्क्रिप्ट -->
+  <!-- संपूर्ण जावास्क्रिप्ट लॉजिक -->
   <script>
     let currentLang = 'hi';
+    let cachedProjects = [];
+    let lastReceiptData = null;
 
-    // भाषा बदलने का फंक्शन
     function toggleLanguage() {
       currentLang = currentLang === 'hi' ? 'en' : 'hi';
       document.getElementById('lang-btn-text').innerText = currentLang === 'hi' ? 'English' : 'हिंदी';
       document.getElementById('ngo-subtitle').innerText = currentLang === 'hi' ? 'मानव विकास संस्थान' : 'Manav Vikas Sansthan';
-      
       document.querySelectorAll('[data-hi]').forEach(el => {
         el.innerText = el.getAttribute(`data-${currentLang}`);
       });
     }
 
-    // Supabase से डेटा लोड करना
-    async function loadDashboardData() {
-      if (!supabaseClient) {
-        document.getElementById('db-status').innerText = 'Offline (Keys Missing)';
-        document.getElementById('db-status').className = 'text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full';
-        document.getElementById('projects-list').innerHTML = `
-          <div class="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-lg text-xs">
-            कृपया index.html फ़ाइल में अपनी Supabase URL और Anon Key अपडेट करें।
-          </div>`;
-        return;
-      }
-
-      try {
-        // 1. प्रोजेक्ट्स फेच करें
-        const { data: projects, error: projError } = await supabaseClient
-          .from('projects')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (projError) throw projError;
-
-        document.getElementById('stat-projects').innerText = projects ? projects.length : 0;
-
-        // प्रोजेक्ट्स स्क्रीन पर दिखाना
-        const listContainer = document.getElementById('projects-list');
-        if (!projects || projects.length === 0) {
-          listContainer.innerHTML = '<div class="bg-white p-4 rounded-xl border text-center text-xs text-slate-500">कोई प्रोजेक्ट नहीं मिला।</div>';
-        } else {
-          listContainer.innerHTML = projects.map(p => `
-            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
-              <div>
-                <h4 class="font-semibold text-sm text-slate-800">${p.project_name}</h4>
-                <p class="text-xs text-slate-500 mt-0.5">📂 ${p.category}</p>
-              </div>
-              <span class="text-xs px-2 py-1 rounded-full font-medium ${p.status === 'Active' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100 text-slate-600'}">
-                ${p.status}
-              </span>
-            </div>
-          `).join('');
-        }
-
-        // 2. लाभार्थी संख्या
-        const { count: benCount } = await supabaseClient
-          .from('beneficiaries')
-          .select('*', { count: 'exact', head: true });
-        document.getElementById('stat-beneficiaries').innerText = benCount || 0;
-
-        // 3. डोनेशन जोड़
-        const { data: donations } = await supabaseClient.from('donations').select('amount');
-        const totalDonation = (donations || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
-        document.getElementById('stat-donations').innerText = `₹${totalDonation.toLocaleString('en-IN')}`;
-
-        // 4. कुल खर्च
-        const { data: expenses } = await supabaseClient.from('expenses').select('amount');
-        const totalExp = (expenses || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
-        document.getElementById('stat-expenses').innerText = `₹${totalExp.toLocaleString('en-IN')}`;
-
-        document.getElementById('db-status').innerText = '● Connected';
-        document.getElementById('db-status').className = 'text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full';
-
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        document.getElementById('projects-list').innerHTML = `
-          <div class="bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-lg text-xs">
-            डेटा लोड करने में समस्या आई: ${err.message}
-          </div>`;
+    function switchTab(tab) {
+      if (tab === 'home') {
+        document.getElementById('view-home').classList.remove('hidden');
+        document.getElementById('view-donations').classList.add('hidden');
+        document.getElementById('tab-home').className = 'text-blue-700 font-semibold flex flex-col items-center';
+        document.getElementById('tab-donations').className = 'text-slate-500 flex flex-col items-center';
+      } else if (tab === 'donations') {
+        document.getElementById('view-home').classList.add('hidden');
+        document.getElementById('view-donations').classList.remove('hidden');
+        document.getElementById('tab-home').className = 'text-slate-500 flex flex-col items-center';
+        document.getElementById('tab-donations').className = 'text-blue-700 font-semibold flex flex-col items-center';
+        loadDonationsList();
       }
     }
 
-    // पेज लोड होने पर डेटा लाएं
-    window.addEventListener('DOMContentLoaded', loadDashboardData);
+    async function loadAllData() {
+      if (!supabaseClient) return;
+
+      try {
+        // 1. प्रोजेक्ट्स फेच करें
+        const { data: projects } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
+        cachedProjects = projects || [];
+        document.getElementById('stat-projects').innerText = cachedProjects.length;
+
+        // प्रोजेक्ट्स लिस्ट और फॉर्म ड्रॉपडाउन अपडेट करें
+        const listContainer = document.getElementById('projects-list');
+        const selectContainer = document.getElementById('donation-project');
+        
+        selectContainer.innerHTML = '<option value="">-- प्रोजेक्ट चुनें --</option>' + 
+          cachedProjects.map(p => `<option value="${p.id}">${p.project_name}</option>`).join('');
+
+        listContainer.innerHTML = cachedProjects.map(p => `
+          <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+            <div>
+              <h4 class="font-semibold text-sm text-slate-800">${p.project_name}</h4>
+              <p class="text-xs text-slate-500 mt-0.5">📂 ${p.category}</p>
+            </div>
+            <span class="text-xs px-2 py-0.5 rounded-full font-medium ${p.status === 'Active' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100'}">${p.status}</span>
+          </div>
+        `).join('');
+
+        // 2. आंकड़े (Donations & Beneficiaries)
+        const { data: donations } = await supabaseClient.from('donations').select('amount');
+        const total = (donations || []).reduce((acc, d) => acc + Number(d.amount || 0), 0);
+        document.getElementById('stat-donations').innerText = `₹${total.toLocaleString('en-IN')}`;
+
+        const { count } = await supabaseClient.from('beneficiaries').select('*', { count: 'exact', head: true });
+        document.getElementById('stat-beneficiaries').innerText = count || 0;
+
+      } catch (err) {
+        console.error('Data error:', err);
+      }
+    }
+
+    async function loadDonationsList() {
+      if (!supabaseClient) return;
+      const listEl = document.getElementById('donations-list');
+      
+      const { data: donations, error } = await supabaseClient
+        .from('donations')
+        .select('id, amount, payment_mode, donation_date, donors(name, phone), projects(project_name)')
+        .order('created_at', { ascending: false });
+
+      if (error || !donations || donations.length === 0) {
+        listEl.innerHTML = '<div class="bg-white p-4 rounded-xl border text-center text-xs text-slate-400">अभी कोई दान रिकॉर्ड नहीं मिला।</div>';
+        return;
+      }
+
+      listEl.innerHTML = donations.map(d => `
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+          <div>
+            <h4 class="font-semibold text-sm text-slate-800">${d.donors?.name || 'दानदाता'}</h4>
+            <p class="text-xs text-slate-500 mt-0.5">📂 ${d.projects?.project_name || 'सामान्य कोष'} • <span class="text-slate-400">${d.payment_mode}</span></p>
+            <p class="text-[10px] text-slate-400 mt-0.5">दिनांक: ${d.donation_date}</p>
+          </div>
+          <div class="text-right">
+            <span class="font-bold text-blue-700 text-sm">₹${Number(d.amount).toLocaleString('en-IN')}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openDonationModal() {
+      document.getElementById('donation-modal').classList.remove('hidden');
+    }
+
+    function closeDonationModal() {
+      document.getElementById('donation-modal').classList.add('hidden');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receipt-modal').classList.add('hidden');
+    }
+
+    // नया दान सुरक्षित करना
+    async function handleDonationSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.innerText = 'सुरक्षित हो रहा है...';
+      btn.disabled = true;
+
+      try {
+        const name = document.getElementById('donor-name').value.trim();
+        const phone = document.getElementById('donor-phone').value.trim();
+        const city = document.getElementById('donor-city').value.trim();
+        const amount = document.getElementById('donation-amount').value;
+        const mode = document.getElementById('donation-mode').value;
+        const projectId = document.getElementById('donation-project').value;
+        const ref = document.getElementById('donation-ref').value.trim();
+
+        // 1. डोनर बनाएँ या खोजें
+        const { data: donor, error: dError } = await supabaseClient
+          .from('donors')
+          .insert([{ name, phone, city }])
+          .select()
+          .single();
+
+        if (dError) throw dError;
+
+        // 2. डोनेशन सेव करें
+        const { data: donation, error: donError } = await supabaseClient
+          .from('donations')
+          .insert([{
+            donor_id: donor.id,
+            project_id: projectId,
+            amount: parseFloat(amount),
+            payment_mode: mode,
+            transaction_ref: ref
+          }])
+          .select('*, projects(project_name)')
+          .single();
+
+        if (donError) throw donError;
+
+        // रसीद के लिए डेटा तैयार करें
+        lastReceiptData = {
+          id: 'MVS-' + donation.id.slice(0, 6).toUpperCase(),
+          date: new Date().toLocaleDateString('en-IN'),
+          name: name,
+          phone: phone,
+          project: donation.projects?.project_name || 'General Fund',
+          amount: parseFloat(amount),
+          mode: mode
+        };
+
+        // रसीद स्क्रीन पर भरें
+        document.getElementById('rec-id').innerText = lastReceiptData.id;
+        document.getElementById('rec-date').innerText = lastReceiptData.date;
+        document.getElementById('rec-name').innerText = lastReceiptData.name;
+        document.getElementById('rec-project').innerText = lastReceiptData.project;
+        document.getElementById('rec-mode').innerText = lastReceiptData.mode;
+        document.getElementById('rec-amount').innerText = `₹${lastReceiptData.amount.toLocaleString('en-IN')}`;
+
+        // फ़ॉर्म रीसेट और मॉडल्स टॉगल
+        document.getElementById('donation-form').reset();
+        closeDonationModal();
+        document.getElementById('receipt-modal').classList.remove('hidden');
+
+        // डैशबोर्ड ताज़ा करें
+        loadAllData();
+
+      } catch (err) {
+        alert('त्रुटि: ' + err.message);
+      } finally {
+        btn.innerText = 'दान सुरक्षित करें और रसीद बनाएं';
+        btn.disabled = false;
+      }
+    }
+
+    // WhatsApp पर रसीद शेयर करना
+    function shareOnWhatsApp() {
+      if (!lastReceiptData) return;
+      const text = encodeURIComponent(
+        `*मानव विकास संस्थान (MVS NGO)*\n` +
+        `दान प्राप्ति रसीद / Donation Receipt\n` +
+        `--------------------------\n` +
+        `रसीद संख्या: ${lastReceiptData.id}\n` +
+        `दानदाता: ${lastReceiptData.name}\n` +
+        `राशि: ₹${lastReceiptData.amount.toLocaleString('en-IN')}\n` +
+        `माध्यम: ${lastReceiptData.mode}\n` +
+        `प्रोजेक्ट: ${lastReceiptData.project}\n` +
+        `दिनांक: ${lastReceiptData.date}\n` +
+        `--------------------------\n` +
+        `शिक्षा एवं महिला सशक्तिकरण में आपके अमूल्य सहयोग के लिए धन्यवाद!`
+      );
+      const phoneParam = lastReceiptData.phone ? `phone=91${lastReceiptData.phone.replace(/[^0-9]/g, '')}&` : '';
+      window.open(`https://api.whatsapp.com/send?${phoneParam}text=${text}`, '_blank');
+    }
+
+    window.addEventListener('DOMContentLoaded', loadAllData);
   </script>
 </body>
 </html>
