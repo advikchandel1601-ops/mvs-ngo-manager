@@ -17,25 +17,55 @@
 </head>
 <body class="bg-slate-50 text-slate-800 pb-24 font-sans">
 
+  <!-- 🔒 सुरक्षा लॉक स्क्रीन (Security PIN Overlay) -->
+  <div id="lock-screen" class="fixed inset-0 bg-blue-900 z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xs rounded-2xl p-6 text-center shadow-2xl space-y-4">
+      <div class="w-14 h-14 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-2xl mx-auto">
+        🔒
+      </div>
+      <div>
+        <h2 class="font-bold text-slate-800 text-base">MVS NGO Manager</h2>
+        <p class="text-xs text-slate-500 mt-0.5">मानव विकास संस्थान</p>
+        <p class="text-[11px] text-blue-700 font-semibold mt-2">प्रवेश हेतु 4-अंकों का पिन दर्ज करें</p>
+      </div>
+
+      <div class="space-y-3">
+        <input type="password" id="pin-input" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="● ● ● ●" class="w-full text-center tracking-[0.5em] text-2xl font-bold border-2 border-slate-300 rounded-xl py-2.5 focus:border-blue-600 outline-none">
+        <p id="pin-error" class="text-xs text-rose-600 hidden font-medium">गलत पिन! पुनः प्रयास करें।</p>
+        <button onclick="verifyPin()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl text-sm shadow active:bg-blue-900">
+          अनलॉक करें (Unlock)
+        </button>
+      </div>
+
+      <div class="border-t pt-3 text-[10px] text-slate-400 space-y-0.5">
+        <p>डिफ़ॉल्ट एडमिन पिन: <b>1122</b></p>
+        <p>डिफ़ॉल्ट स्टाफ पिन: <b>3344</b></p>
+      </div>
+    </div>
+  </div>
+
   <!-- शीर्ष पट्टी (Header) -->
   <header class="bg-blue-700 text-white shadow-md sticky top-0 z-30">
     <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
       <div>
         <h1 class="text-lg font-bold tracking-tight">MVS NGO Manager</h1>
-        <p class="text-xs text-blue-100" id="ngo-subtitle">मानव विकास संस्थान</p>
+        <p class="text-xs text-blue-100 flex items-center gap-1.5">
+          <span id="role-badge" class="bg-blue-800 px-2 py-0.2 rounded text-[10px] font-semibold border border-blue-400">Admin</span>
+          <span id="ngo-subtitle">मानव विकास संस्थान</span>
+        </p>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="openConfigModal()" class="bg-blue-800 border border-blue-400 text-xs px-2.5 py-1.5 rounded-full font-medium active:bg-blue-900">
-          ⚙️ सेटिंग्स
+      <div class="flex items-center gap-1.5">
+        <button onclick="openConfigModal()" id="btn-settings" class="bg-blue-800 border border-blue-400 text-xs px-2 py-1.5 rounded-full font-medium active:bg-blue-900">
+          ⚙️
         </button>
-        <button onclick="toggleLanguage()" class="bg-blue-800 border border-blue-400 text-xs px-2.5 py-1.5 rounded-full font-medium active:bg-blue-900">
-          🌐 <span id="lang-btn-text">English</span>
+        <button onclick="lockApp()" class="bg-blue-800 border border-blue-400 text-xs px-2.5 py-1.5 rounded-full font-medium active:bg-blue-900" title="ऐप लॉक करें">
+          🔒 लॉक
         </button>
       </div>
     </div>
   </header>
 
-  <!-- ऑन-स्क्रीन मैसेज बार (त्रुटि / सफलता देखने के लिए) -->
+  <!-- ऑन-स्क्रीन स्थिति पट्टी -->
   <div id="status-bar" class="max-w-md mx-auto px-4 pt-2 hidden">
     <div id="status-box" class="p-3 rounded-xl text-xs font-medium flex justify-between items-center">
       <span id="status-msg"></span>
@@ -84,7 +114,7 @@
           <button onclick="openModal('beneficiary-modal')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 py-2.5 px-1 rounded-lg font-bold text-center active:bg-emerald-100">
             + लाभार्थी
           </button>
-          <button onclick="openModal('expense-modal')" class="bg-rose-50 text-rose-700 border border-rose-200 py-2.5 px-1 rounded-lg font-bold text-center active:bg-rose-100">
+          <button onclick="openModal('expense-modal')" id="btn-quick-expense" class="bg-rose-50 text-rose-700 border border-rose-200 py-2.5 px-1 rounded-lg font-bold text-center active:bg-rose-100">
             + खर्च
           </button>
         </div>
@@ -163,27 +193,42 @@
 
   </main>
 
-  <!-- ⚙️ सेटिंग्स मॉडल (Supabase Keys Setup Modal) -->
+  <!-- ⚙️ सेटिंग्स एवं पिन परिवर्तन मॉडल (Admin Settings) -->
   <div id="config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-3 shadow-2xl">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-slate-800 text-sm">⚙️ डेटाबेस कनेक्शन सेटअप</h3>
+        <h3 class="font-bold text-slate-800 text-sm">⚙️ एडमिन सेटिंग्स</h3>
         <button onclick="closeModal('config-modal')" class="text-slate-400 text-2xl leading-none">&times;</button>
       </div>
-      <p class="text-xs text-slate-500">यदि आपका डेटा सेव नहीं हो रहा, तो अपनी Supabase Project URL और Key यहाँ पेस्ट करके सेव कर दें:</p>
-      <div class="space-y-2 text-xs">
+      
+      <!-- सुरक्षा पिन बदलें -->
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 text-xs">
+        <h4 class="font-bold text-blue-900">सुरक्षा पिन बदलें (Change PINs)</h4>
         <div>
-          <label class="block font-medium mb-1">Project URL:</label>
-          <input type="text" id="cfg-url" placeholder="https://xyz.supabase.co" class="w-full border p-2 rounded-lg text-xs outline-none">
+          <label class="block text-slate-600 mb-0.5">नया Admin PIN (4 अंक):</label>
+          <input type="password" id="cfg-admin-pin" maxlength="4" placeholder="1122" class="w-full border p-1.5 rounded-lg outline-none text-center font-bold tracking-widest">
         </div>
         <div>
-          <label class="block font-medium mb-1">Anon Public Key:</label>
-          <input type="text" id="cfg-key" placeholder="eyJhbGciOiJIUzI1NiIsIn..." class="w-full border p-2 rounded-lg text-xs outline-none">
+          <label class="block text-slate-600 mb-0.5">नया Staff PIN (4 अंक):</label>
+          <input type="password" id="cfg-staff-pin" maxlength="4" placeholder="3344" class="w-full border p-1.5 rounded-lg outline-none text-center font-bold tracking-widest">
         </div>
-        <button onclick="saveSupabaseConfig()" class="w-full bg-blue-700 text-white font-bold py-2.5 rounded-lg active:bg-blue-800">
-          Save & Connect Now
+        <button onclick="savePinConfig()" class="w-full bg-slate-800 text-white font-medium py-1.5 rounded-lg active:bg-black">
+          पिन अपडेट करें
         </button>
       </div>
+
+      <!-- डेटाबेस बैकअप लिंक -->
+      <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 space-y-1.5 text-xs">
+        <h4 class="font-bold text-emerald-900">📥 डेटा बैकअप (Excel/CSV)</h4>
+        <p class="text-[11px] text-emerald-800">Supabase टेबल एडिटर से सीधे अपने फोन में 1-क्लिक बैकअप डाउनलोड करें:</p>
+        <a href="https://supabase.com/dashboard" target="_blank" class="block text-center bg-emerald-600 text-white py-1.5 rounded-lg font-medium">
+          Supabase Dashboard खोलें
+        </a>
+      </div>
+
+      <button onclick="closeModal('config-modal')" class="w-full text-center text-slate-400 text-xs py-1">
+        बंद करें
+      </button>
     </div>
   </div>
 
@@ -381,46 +426,84 @@
     let supabaseClient = null;
     let cachedProjects = [];
     let lastReceiptData = null;
+    let currentUserRole = null;
 
-    // Supabase इनिशियलाइज़ करना (LocalStorage या इनलाइन से)
+    // सुरक्षा पिन जांचना
+    function verifyPin() {
+      const entered = document.getElementById('pin-input').value.trim();
+      const adminPin = localStorage.getItem('MVS_ADMIN_PIN') || '1122';
+      const staffPin = localStorage.getItem('MVS_STAFF_PIN') || '3344';
+
+      if (entered === adminPin) {
+        currentUserRole = 'Admin';
+        unlockApp();
+      } else if (entered === staffPin) {
+        currentUserRole = 'Staff';
+        unlockApp();
+      } else {
+        document.getElementById('pin-error').classList.remove('hidden');
+        document.getElementById('pin-input').value = '';
+      }
+    }
+
+    function unlockApp() {
+      document.getElementById('lock-screen').classList.add('hidden');
+      document.getElementById('role-badge').innerText = currentUserRole;
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-error').classList.add('hidden');
+
+      // स्टाफ के लिए कुछ फीचर्स सीमित करना
+      if (currentUserRole === 'Staff') {
+        document.getElementById('btn-settings').classList.add('hidden');
+        document.getElementById('tab-reports').classList.add('hidden');
+        document.getElementById('btn-quick-expense').classList.add('hidden');
+      } else {
+        document.getElementById('btn-settings').classList.remove('hidden');
+        document.getElementById('tab-reports').classList.remove('hidden');
+        document.getElementById('btn-quick-expense').classList.remove('hidden');
+      }
+
+      initSupabase();
+      loadAllData();
+    }
+
+    function lockApp() {
+      currentUserRole = null;
+      document.getElementById('lock-screen').classList.remove('hidden');
+      document.getElementById('pin-input').value = '';
+    }
+
+    function savePinConfig() {
+      const aPin = document.getElementById('cfg-admin-pin').value.trim();
+      const sPin = document.getElementById('cfg-staff-pin').value.trim();
+      if (aPin.length === 4) localStorage.setItem('MVS_ADMIN_PIN', aPin);
+      if (sPin.length === 4) localStorage.setItem('MVS_STAFF_PIN', sPin);
+      closeModal('config-modal');
+      showStatus('पिन सफलतापूर्वक बदल दिया गया!', 'success');
+    }
+
+    // Supabase इनिशियलाइज़ करना
     function initSupabase() {
-      const url = localStorage.getItem('MVS_SUPA_URL') || "YOUR_SUPABASE_URL_HERE";
-      const key = localStorage.getItem('MVS_SUPA_KEY') || "YOUR_SUPABASE_ANON_KEY_HERE";
+      const url = localStorage.getItem('MVS_SUPA_URL');
+      const key = localStorage.getItem('MVS_SUPA_KEY');
 
-      if (url && url !== "YOUR_SUPABASE_URL_HERE" && key && key !== "YOUR_SUPABASE_ANON_KEY_HERE") {
+      if (url && key) {
         try {
           supabaseClient = supabase.createClient(url, key);
           document.getElementById('db-status').innerText = '● Live';
           document.getElementById('db-status').className = 'text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full';
           return true;
         } catch (e) {
-          showStatus('Supabase कनेक्ट नहीं हो सका: ' + e.message, 'error');
+          showStatus('कनेक्शन त्रुटि: ' + e.message, 'error');
         }
       }
-      document.getElementById('db-status').innerText = '⚠️ नॉट कनेक्टेड';
-      document.getElementById('db-status').className = 'text-xs bg-amber-100 text-amber-700 font-medium px-2 py-0.5 rounded-full';
       return false;
     }
 
     function openConfigModal() {
-      document.getElementById('cfg-url').value = localStorage.getItem('MVS_SUPA_URL') || '';
-      document.getElementById('cfg-key').value = localStorage.getItem('MVS_SUPA_KEY') || '';
+      document.getElementById('cfg-admin-pin').value = localStorage.getItem('MVS_ADMIN_PIN') || '1122';
+      document.getElementById('cfg-staff-pin').value = localStorage.getItem('MVS_STAFF_PIN') || '3344';
       openModal('config-modal');
-    }
-
-    function saveSupabaseConfig() {
-      const url = document.getElementById('cfg-url').value.trim();
-      const key = document.getElementById('cfg-key').value.trim();
-      if (!url || !key) {
-        alert('कृपया दोनों बॉक्स भरें');
-        return;
-      }
-      localStorage.setItem('MVS_SUPA_URL', url);
-      localStorage.setItem('MVS_SUPA_KEY', key);
-      closeModal('config-modal');
-      showStatus('डेटाबेस सेटिंग्स सेव हो गईं! लोड हो रहा है...', 'success');
-      initSupabase();
-      loadAllData();
     }
 
     function showStatus(msg, type = 'info') {
@@ -434,11 +517,15 @@
       } else {
         box.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 flex justify-between items-center';
       }
-      setTimeout(() => bar.classList.add('hidden'), 6000);
+      setTimeout(() => bar.classList.add('hidden'), 5000);
     }
     function hideStatus() { document.getElementById('status-bar').classList.add('hidden'); }
 
     function switchTab(tab) {
+      if (currentUserRole === 'Staff' && tab === 'reports') {
+        alert('रिपोर्ट्स केवल एडमिन देख सकते हैं!');
+        return;
+      }
       ['home', 'donations', 'beneficiaries', 'reports'].forEach(t => {
         document.getElementById(`view-${t}`).classList.add('hidden');
         document.getElementById(`tab-${t}`).className = 'text-slate-500 flex flex-col items-center';
@@ -455,9 +542,7 @@
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
     async function loadAllData() {
-      if (!supabaseClient) {
-        if (!initSupabase()) return;
-      }
+      if (!supabaseClient) return;
 
       try {
         const { data: projects, error: pErr } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
@@ -568,8 +653,6 @@
 
     async function handleDonationSubmit(e) {
       e.preventDefault();
-      if (!supabaseClient) { openConfigModal(); return; }
-
       const btn = document.getElementById('submit-btn');
       btn.innerText = 'सेव हो रहा है...'; btn.disabled = true;
       try {
@@ -619,8 +702,6 @@
 
     async function handleBeneficiarySubmit(e) {
       e.preventDefault();
-      if (!supabaseClient) { openConfigModal(); return; }
-
       const btn = document.getElementById('ben-submit-btn');
       btn.innerText = 'सेव हो रहा है...'; btn.disabled = true;
       try {
@@ -649,8 +730,6 @@
 
     async function handleExpenseSubmit(e) {
       e.preventDefault();
-      if (!supabaseClient) { openConfigModal(); return; }
-
       const btn = document.getElementById('exp-submit-btn');
       btn.innerText = 'सेव हो रहा है...'; btn.disabled = true;
       try {
@@ -683,17 +762,6 @@
       const phoneParam = lastReceiptData.phone ? `phone=91${lastReceiptData.phone.replace(/[^0-9]/g, '')}&` : '';
       window.open(`https://api.whatsapp.com/send?${phoneParam}text=${text}`, '_blank');
     }
-
-    function toggleLanguage() {
-      const current = document.getElementById('lang-btn-text').innerText;
-      document.getElementById('lang-btn-text').innerText = current === 'English' ? 'हिंदी' : 'English';
-      document.getElementById('ngo-subtitle').innerText = current === 'English' ? 'Manav Vikas Sansthan' : 'मानव विकास संस्थान';
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initSupabase();
-      loadAllData();
-    });
   </script>
 </body>
 </html>
