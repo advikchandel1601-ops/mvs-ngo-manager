@@ -17,7 +17,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 pb-24 font-sans">
 
-  <!-- 🔒 सुरक्षा लॉक स्क्रीन (Security PIN Overlay) -->
+  <!-- 🔒 सुरक्षा लॉक स्क्रीन -->
   <div id="lock-screen" class="fixed inset-0 bg-blue-900 z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-xs rounded-2xl p-6 text-center shadow-2xl space-y-4">
       <div class="w-14 h-14 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-2xl mx-auto">
@@ -38,8 +38,7 @@
       </div>
 
       <div class="border-t pt-3 text-[10px] text-slate-400 space-y-0.5">
-        <p>डिफ़ॉल्ट एडमिन पिन: <b>1122</b></p>
-        <p>डिफ़ॉल्ट स्टाफ पिन: <b>3344</b></p>
+        <p>एडमिन पिन: <b>1122</b> | स्टाफ: <b>3344</b></p>
       </div>
     </div>
   </div>
@@ -55,10 +54,10 @@
         </p>
       </div>
       <div class="flex items-center gap-1.5">
-        <button onclick="openConfigModal()" id="btn-settings" class="bg-blue-800 border border-blue-400 text-xs px-2 py-1.5 rounded-full font-medium active:bg-blue-900">
+        <button onclick="openConfigModal()" id="btn-settings" class="bg-blue-800 border border-blue-400 text-xs px-2 py-1.5 rounded-full font-medium active:bg-blue-900" title="सेटिंग्स">
           ⚙️
         </button>
-        <button onclick="lockApp()" class="bg-blue-800 border border-blue-400 text-xs px-2.5 py-1.5 rounded-full font-medium active:bg-blue-900" title="ऐप लॉक करें">
+        <button onclick="lockApp()" class="bg-blue-800 border border-blue-400 text-xs px-2.5 py-1.5 rounded-full font-medium active:bg-blue-900">
           🔒 लॉक
         </button>
       </div>
@@ -109,7 +108,7 @@
         <h3 class="text-xs font-semibold text-slate-500 uppercase mb-2">त्वरित प्रविष्टि (Quick Add)</h3>
         <div class="grid grid-cols-3 gap-2 text-xs">
           <button onclick="openModal('donation-modal')" class="bg-blue-50 text-blue-700 border border-blue-200 py-2.5 px-1 rounded-lg font-bold text-center active:bg-blue-100">
-            + दान
+            + दान (80G)
           </button>
           <button onclick="openModal('beneficiary-modal')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 py-2.5 px-1 rounded-lg font-bold text-center active:bg-emerald-100">
             + लाभार्थी
@@ -127,7 +126,7 @@
           <button onclick="loadAllData()" class="text-xs text-blue-600 font-medium underline">रिफ्रेश</button>
         </div>
         <div id="projects-list" class="space-y-2">
-          <div class="text-center text-slate-400 text-xs py-4">प्रोजेक्ट्स लोड हो रहे हैं...</div>
+          <div class="text-center text-slate-400 text-xs py-4">लोड हो रहा है...</div>
         </div>
       </section>
     </div>
@@ -137,7 +136,7 @@
       <div class="flex justify-between items-center">
         <h2 class="text-sm font-bold text-slate-700">प्राप्त दान रिकॉर्ड्स</h2>
         <button onclick="openModal('donation-modal')" class="bg-blue-600 text-white text-xs font-medium px-3 py-1.5 rounded-lg active:bg-blue-700">
-          + नया दान
+          + नया दान (80G)
         </button>
       </div>
       <div id="donations-list" class="space-y-2">
@@ -170,7 +169,7 @@
       <div id="printable-report" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
         <div class="border-b pb-2 text-center">
           <h3 class="font-bold text-slate-800 text-sm">मानव विकास संस्थान (MVS NGO)</h3>
-          <p class="text-[10px] text-slate-500">वित्तीय एवं प्रगति रिपोर्ट</p>
+          <p class="text-[10px] text-slate-500">वित्तीय एवं 80G ऑडिट सारांश रिपोर्ट</p>
         </div>
         <div class="space-y-1.5 text-xs">
           <div class="flex justify-between"><span class="text-slate-500">कुल दान संग्रह:</span> <span class="font-bold text-blue-700" id="rep-total-donations">₹0</span></div>
@@ -193,17 +192,33 @@
 
   </main>
 
-  <!-- ⚙️ सेटिंग्स एवं पिन परिवर्तन मॉडल (Admin Settings) -->
+  <!-- ⚙️ एडमिन सेटिंग्स मॉडल (80G विवरण + पिन) -->
   <div id="config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-3 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-3.5 shadow-2xl max-h-[92vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-slate-800 text-sm">⚙️ एडमिन सेटिंग्स</h3>
+        <h3 class="font-bold text-slate-800 text-sm">⚙️ एडमिन एवं 80G सेटिंग्स</h3>
         <button onclick="closeModal('config-modal')" class="text-slate-400 text-2xl leading-none">&times;</button>
       </div>
       
+      <!-- संस्था 80G विवरण -->
+      <div class="bg-blue-50/70 p-3 rounded-xl border border-blue-200 space-y-2 text-xs">
+        <h4 class="font-bold text-blue-900 flex items-center gap-1">📜 संस्था 80G विवरण (रसीद हेतु)</h4>
+        <div>
+          <label class="block text-slate-600 mb-0.5">संस्था का PAN नंबर:</label>
+          <input type="text" id="cfg-ngo-pan" placeholder="उदा. AABTM1234F" class="w-full border p-1.5 rounded-lg uppercase outline-none font-semibold text-slate-800">
+        </div>
+        <div>
+          <label class="block text-slate-600 mb-0.5">80G URN / रजिस्ट्रेशन संख्या:</label>
+          <input type="text" id="cfg-ngo-80g" placeholder="उदा. CIT(E)/VNS/80G/2022-23" class="w-full border p-1.5 rounded-lg outline-none font-semibold text-slate-800">
+        </div>
+        <button onclick="save80gConfig()" class="w-full bg-blue-700 text-white font-medium py-1.5 rounded-lg active:bg-blue-800">
+          80G विवरण सुरक्षित करें
+        </button>
+      </div>
+
       <!-- सुरक्षा पिन बदलें -->
       <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 text-xs">
-        <h4 class="font-bold text-blue-900">सुरक्षा पिन बदलें (Change PINs)</h4>
+        <h4 class="font-bold text-slate-800">सुरक्षा पिन बदलें</h4>
         <div>
           <label class="block text-slate-600 mb-0.5">नया Admin PIN (4 अंक):</label>
           <input type="password" id="cfg-admin-pin" maxlength="4" placeholder="1122" class="w-full border p-1.5 rounded-lg outline-none text-center font-bold tracking-widest">
@@ -217,26 +232,17 @@
         </button>
       </div>
 
-      <!-- डेटाबेस बैकअप लिंक -->
-      <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 space-y-1.5 text-xs">
-        <h4 class="font-bold text-emerald-900">📥 डेटा बैकअप (Excel/CSV)</h4>
-        <p class="text-[11px] text-emerald-800">Supabase टेबल एडिटर से सीधे अपने फोन में 1-क्लिक बैकअप डाउनलोड करें:</p>
-        <a href="https://supabase.com/dashboard" target="_blank" class="block text-center bg-emerald-600 text-white py-1.5 rounded-lg font-medium">
-          Supabase Dashboard खोलें
-        </a>
-      </div>
-
       <button onclick="closeModal('config-modal')" class="w-full text-center text-slate-400 text-xs py-1">
         बंद करें
       </button>
     </div>
   </div>
 
-  <!-- डोनेशन मॉडल -->
+  <!-- डोनेशन मॉडल (80G इनपुट के साथ) -->
   <div id="donation-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="bg-white w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 max-h-[92vh] overflow-y-auto space-y-3 shadow-xl">
       <div class="flex justify-between items-center border-b pb-2">
-        <h3 class="font-bold text-slate-800 text-sm">दान प्रविष्टि (Donation Entry)</h3>
+        <h3 class="font-bold text-slate-800 text-sm">दान प्रविष्टि (Donation & 80G)</h3>
         <button onclick="closeModal('donation-modal')" class="text-slate-400 text-2xl leading-none">&times;</button>
       </div>
       <form id="donation-form" onsubmit="handleDonationSubmit(event)" class="space-y-2.5 text-xs">
@@ -254,6 +260,19 @@
             <input type="text" id="donor-city" placeholder="उदा. वाराणसी" class="w-full border p-2 rounded-lg text-sm outline-none">
           </div>
         </div>
+
+        <!-- 80G टैक्स छूट चेकबॉक्स -->
+        <div class="bg-blue-50/60 p-2.5 rounded-lg border border-blue-200 space-y-2">
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="donor-80g-check" onchange="togglePanField()" class="w-4 h-4 text-blue-600 rounded">
+            <label for="donor-80g-check" class="font-bold text-blue-900 cursor-pointer">80G टैक्स छूट रसीद चाहिए (Claim 80G)</label>
+          </div>
+          <div id="pan-field-wrapper" class="hidden">
+            <label class="block font-medium text-slate-700 mb-1">दाता का PAN कार्ड नंबर * (80G हेतु अनिवार्य):</label>
+            <input type="text" id="donor-pan" maxlength="10" placeholder="उदा. ABCDE1234F" class="w-full border border-blue-300 p-2 rounded-lg text-sm uppercase font-bold text-blue-900 bg-white outline-none">
+          </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-medium mb-1">दान राशि (₹) *</label>
@@ -262,8 +281,8 @@
           <div>
             <label class="block font-medium mb-1">माध्यम</label>
             <select id="donation-mode" class="w-full border p-2 rounded-lg text-sm bg-white outline-none">
-              <option value="Cash">Cash (नकद)</option>
               <option value="Direct UPI Transfer">Direct UPI</option>
+              <option value="Cash">Cash (नकद)</option>
               <option value="Cheque">Cheque</option>
               <option value="Other">Other</option>
             </select>
@@ -280,7 +299,7 @@
           <input type="text" id="donation-ref" placeholder="उदा. 40291823901" class="w-full border p-2 rounded-lg text-sm outline-none">
         </div>
         <button type="submit" id="submit-btn" class="w-full bg-blue-700 text-white font-bold py-3 rounded-xl text-sm shadow active:bg-blue-800">
-          दान सुरक्षित करें और रसीद बनाएं
+          दान सुरक्षित करें और 80G रसीद बनाएं
         </button>
       </form>
     </div>
@@ -363,405 +382,25 @@
     </div>
   </div>
 
-  <!-- रसीद मॉडल -->
-  <div id="receipt-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-2xl p-5 space-y-3 shadow-2xl">
-      <div id="printable-receipt" class="border border-blue-200 bg-blue-50/40 rounded-xl p-4 text-xs space-y-2.5">
-        <div class="text-center border-b border-blue-200 pb-2">
+  <!-- 80G डोनेशन रसीद स्लिप मॉडल (80G Receipt Slip) -->
+  <div id="receipt-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3">
+    <div class="bg-white w-full max-w-sm rounded-2xl p-4 sm:p-5 space-y-3 shadow-2xl max-h-[96vh] overflow-y-auto">
+      
+      <!-- प्रिंट होने वाला 80G रसीद भाग -->
+      <div id="printable-receipt" class="border-2 border-blue-600 bg-white rounded-xl p-3.5 text-xs space-y-2.5">
+        
+        <!-- हेडर -->
+        <div class="text-center border-b-2 border-blue-600 pb-2">
           <h2 class="font-bold text-base text-blue-900">MANAV VIKAS SANSTHAN</h2>
-          <p class="text-[10px] text-slate-500">मानव विकास संस्थान (Regd. NGO)</p>
-          <p class="text-[10px] font-semibold text-blue-700 mt-1">दान प्राप्ति रसीद / DONATION RECEIPT</p>
-        </div>
-        <div class="space-y-1">
-          <div class="flex justify-between"><span class="text-slate-500">रसीद संख्या:</span> <span class="font-bold text-blue-900" id="rec-id">-</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">दिनांक:</span> <span id="rec-date">-</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">दाता:</span> <span class="font-bold text-slate-800" id="rec-name">-</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">प्रोजेक्ट:</span> <span id="rec-project">-</span></div>
-          <div class="flex justify-between"><span class="text-slate-500">माध्यम:</span> <span id="rec-mode">-</span></div>
-        </div>
-        <div class="bg-blue-100/70 p-2 rounded-lg flex justify-between items-center border border-blue-200">
-          <span class="font-bold text-slate-700">प्राप्त राशि:</span>
-          <span class="font-bold text-lg text-blue-800" id="rec-amount">₹0</span>
-        </div>
-        <p class="text-[9px] text-center text-slate-400 italic">"शिक्षा एवं महिला सशक्तिकरण में आपके सहयोग हेतु धन्यवाद।"</p>
-      </div>
-      <div class="grid grid-cols-2 gap-2 text-xs">
-        <button onclick="shareOnWhatsApp()" class="bg-emerald-600 text-white font-medium py-2 px-3 rounded-lg flex items-center justify-center gap-1 active:bg-emerald-700">
-          <span>💬</span> WhatsApp
-        </button>
-        <button onclick="window.print()" class="bg-slate-800 text-white font-medium py-2 px-3 rounded-lg flex items-center justify-center gap-1 active:bg-black">
-          <span>🖨️</span> प्रिंट / PDF
-        </button>
-      </div>
-      <button onclick="closeModal('receipt-modal')" class="w-full text-center text-slate-500 text-xs font-semibold py-1">
-        बंद करें (Close)
-      </button>
-    </div>
-  </div>
-
-  <!-- बॉटम नेविगेशन -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 py-2 z-20 shadow-lg">
-    <div class="max-w-md mx-auto px-4 flex justify-around text-center text-xs">
-      <button onclick="switchTab('home')" id="tab-home" class="text-blue-700 font-semibold flex flex-col items-center">
-        <span class="text-lg">🏠</span>
-        <span>होम</span>
-      </button>
-      <button onclick="switchTab('donations')" id="tab-donations" class="text-slate-500 flex flex-col items-center">
-        <span class="text-lg">💰</span>
-        <span>दान</span>
-      </button>
-      <button onclick="switchTab('beneficiaries')" id="tab-beneficiaries" class="text-slate-500 flex flex-col items-center">
-        <span class="text-lg">👥</span>
-        <span>लाभार्थी</span>
-      </button>
-      <button onclick="switchTab('reports')" id="tab-reports" class="text-slate-500 flex flex-col items-center">
-        <span class="text-lg">📊</span>
-        <span>रिपोर्ट्स</span>
-      </button>
-    </div>
-  </nav>
-
-  <!-- संपूर्ण जावास्क्रिप्ट लॉजिक -->
-  <script>
-    let supabaseClient = null;
-    let cachedProjects = [];
-    let lastReceiptData = null;
-    let currentUserRole = null;
-
-    // सुरक्षा पिन जांचना
-    function verifyPin() {
-      const entered = document.getElementById('pin-input').value.trim();
-      const adminPin = localStorage.getItem('MVS_ADMIN_PIN') || '1122';
-      const staffPin = localStorage.getItem('MVS_STAFF_PIN') || '3344';
-
-      if (entered === adminPin) {
-        currentUserRole = 'Admin';
-        unlockApp();
-      } else if (entered === staffPin) {
-        currentUserRole = 'Staff';
-        unlockApp();
-      } else {
-        document.getElementById('pin-error').classList.remove('hidden');
-        document.getElementById('pin-input').value = '';
-      }
-    }
-
-    function unlockApp() {
-      document.getElementById('lock-screen').classList.add('hidden');
-      document.getElementById('role-badge').innerText = currentUserRole;
-      document.getElementById('pin-input').value = '';
-      document.getElementById('pin-error').classList.add('hidden');
-
-      // स्टाफ के लिए कुछ फीचर्स सीमित करना
-      if (currentUserRole === 'Staff') {
-        document.getElementById('btn-settings').classList.add('hidden');
-        document.getElementById('tab-reports').classList.add('hidden');
-        document.getElementById('btn-quick-expense').classList.add('hidden');
-      } else {
-        document.getElementById('btn-settings').classList.remove('hidden');
-        document.getElementById('tab-reports').classList.remove('hidden');
-        document.getElementById('btn-quick-expense').classList.remove('hidden');
-      }
-
-      initSupabase();
-      loadAllData();
-    }
-
-    function lockApp() {
-      currentUserRole = null;
-      document.getElementById('lock-screen').classList.remove('hidden');
-      document.getElementById('pin-input').value = '';
-    }
-
-    function savePinConfig() {
-      const aPin = document.getElementById('cfg-admin-pin').value.trim();
-      const sPin = document.getElementById('cfg-staff-pin').value.trim();
-      if (aPin.length === 4) localStorage.setItem('MVS_ADMIN_PIN', aPin);
-      if (sPin.length === 4) localStorage.setItem('MVS_STAFF_PIN', sPin);
-      closeModal('config-modal');
-      showStatus('पिन सफलतापूर्वक बदल दिया गया!', 'success');
-    }
-
-    // Supabase इनिशियलाइज़ करना
-    function initSupabase() {
-      const url = localStorage.getItem('MVS_SUPA_URL');
-      const key = localStorage.getItem('MVS_SUPA_KEY');
-
-      if (url && key) {
-        try {
-          supabaseClient = supabase.createClient(url, key);
-          document.getElementById('db-status').innerText = '● Live';
-          document.getElementById('db-status').className = 'text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full';
-          return true;
-        } catch (e) {
-          showStatus('कनेक्शन त्रुटि: ' + e.message, 'error');
-        }
-      }
-      return false;
-    }
-
-    function openConfigModal() {
-      document.getElementById('cfg-admin-pin').value = localStorage.getItem('MVS_ADMIN_PIN') || '1122';
-      document.getElementById('cfg-staff-pin').value = localStorage.getItem('MVS_STAFF_PIN') || '3344';
-      openModal('config-modal');
-    }
-
-    function showStatus(msg, type = 'info') {
-      const bar = document.getElementById('status-bar');
-      const box = document.getElementById('status-box');
-      const text = document.getElementById('status-msg');
-      text.innerText = msg;
-      bar.classList.remove('hidden');
-      if (type === 'error') {
-        box.className = 'p-3 rounded-xl text-xs font-medium bg-rose-100 text-rose-800 border border-rose-200 flex justify-between items-center';
-      } else {
-        box.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200 flex justify-between items-center';
-      }
-      setTimeout(() => bar.classList.add('hidden'), 5000);
-    }
-    function hideStatus() { document.getElementById('status-bar').classList.add('hidden'); }
-
-    function switchTab(tab) {
-      if (currentUserRole === 'Staff' && tab === 'reports') {
-        alert('रिपोर्ट्स केवल एडमिन देख सकते हैं!');
-        return;
-      }
-      ['home', 'donations', 'beneficiaries', 'reports'].forEach(t => {
-        document.getElementById(`view-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = 'text-slate-500 flex flex-col items-center';
-      });
-      document.getElementById(`view-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = 'text-blue-700 font-semibold flex flex-col items-center';
-
-      if (tab === 'donations') loadDonationsList();
-      if (tab === 'beneficiaries') loadBeneficiariesList();
-      if (tab === 'reports') loadExpensesList();
-    }
-
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-    async function loadAllData() {
-      if (!supabaseClient) return;
-
-      try {
-        const { data: projects, error: pErr } = await supabaseClient.from('projects').select('*').order('created_at', { ascending: false });
-        if (pErr) throw pErr;
-
-        cachedProjects = projects || [];
-        const optionsHtml = cachedProjects.map(p => `<option value="${p.id}">${p.project_name}</option>`).join('');
-        document.querySelectorAll('.project-dropdown').forEach(sel => {
-          const defaultText = sel.id === 'ben-project' ? '-- प्रोजेक्ट चुनें --' : 'सामान्य कोष (General Fund)';
-          sel.innerHTML = `<option value="">${defaultText}</option>` + optionsHtml;
-        });
-
-        document.getElementById('projects-list').innerHTML = cachedProjects.length ? cachedProjects.map(p => `
-          <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
-            <div>
-              <h4 class="font-semibold text-xs text-slate-800">${p.project_name}</h4>
-              <p class="text-[10px] text-slate-500 mt-0.5">📂 ${p.category}</p>
-            </div>
-            <span class="text-[10px] px-2 py-0.5 rounded-full font-medium ${p.status === 'Active' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-slate-100'}">${p.status}</span>
+          <p class="text-[10px] text-slate-600 font-medium">मानव विकास संस्थान (पंजीकृत धर्मार्थ संस्था)</p>
+          <p class="text-[9px] text-blue-800 font-semibold mt-0.5" id="rec-ngo-details">PAN: AABTM1234F | 80G Reg: CIT(E)/VNS/80G/2022-23</p>
+          <div class="inline-block bg-blue-100 text-blue-900 px-2.5 py-0.5 rounded font-bold text-[10px] mt-1 border border-blue-300">
+            दान प्राप्ति रसीद / DONATION RECEIPT (SEC 80G)
           </div>
-        `).join('') : '<div class="text-center text-xs text-slate-400 py-3">कोई प्रोजेक्ट नहीं मिला</div>';
-
-        // डोनेशन योग
-        const { data: donations } = await supabaseClient.from('donations').select('amount');
-        const totalDonation = (donations || []).reduce((acc, d) => acc + Number(d.amount || 0), 0);
-        document.getElementById('stat-donations').innerText = `₹${totalDonation.toLocaleString('en-IN')}`;
-        document.getElementById('rep-total-donations').innerText = `₹${totalDonation.toLocaleString('en-IN')}`;
-
-        // खर्च योग
-        const { data: expenses } = await supabaseClient.from('expenses').select('amount');
-        const totalExpense = (expenses || []).reduce((acc, e) => acc + Number(e.amount || 0), 0);
-        document.getElementById('stat-expenses').innerText = `₹${totalExpense.toLocaleString('en-IN')}`;
-        document.getElementById('rep-total-expenses').innerText = `₹${totalExpense.toLocaleString('en-IN')}`;
-
-        // शेष बैलेंस
-        const balance = totalDonation - totalExpense;
-        document.getElementById('stat-balance').innerText = `₹${balance.toLocaleString('en-IN')}`;
-        document.getElementById('rep-net-balance').innerText = `₹${balance.toLocaleString('en-IN')}`;
-
-        // लाभार्थी
-        const { count } = await supabaseClient.from('beneficiaries').select('*', { count: 'exact', head: true });
-        document.getElementById('stat-beneficiaries').innerText = count || 0;
-        document.getElementById('rep-total-beneficiaries').innerText = count || 0;
-
-      } catch (err) {
-        console.error(err);
-        showStatus('डेटा लोड त्रुटि: ' + err.message, 'error');
-      }
-    }
-
-    async function loadDonationsList() {
-      if (!supabaseClient) return;
-      const listEl = document.getElementById('donations-list');
-      const { data, error } = await supabaseClient.from('donations').select('*, donors(name), projects(project_name)').order('created_at', { ascending: false });
-      if (error || !data || data.length === 0) {
-        listEl.innerHTML = '<div class="bg-white p-4 rounded-xl border text-center text-xs text-slate-400">कोई दान रिकॉर्ड नहीं मिला।</div>';
-        return;
-      }
-      listEl.innerHTML = data.map(d => `
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center text-xs">
-          <div>
-            <h4 class="font-bold text-slate-800">${d.donors?.name || 'दानदाता'}</h4>
-            <p class="text-slate-500 mt-0.5">📂 ${d.projects?.project_name || 'सामान्य कोष'} • ${d.payment_mode}</p>
-          </div>
-          <span class="font-bold text-blue-700 text-sm">₹${Number(d.amount).toLocaleString('en-IN')}</span>
         </div>
-      `).join('');
-    }
 
-    async function loadBeneficiariesList() {
-      if (!supabaseClient) return;
-      const listEl = document.getElementById('beneficiaries-list');
-      const { data, error } = await supabaseClient.from('beneficiaries').select('*, projects(project_name)').order('created_at', { ascending: false });
-      if (error || !data || data.length === 0) {
-        listEl.innerHTML = '<div class="bg-white p-4 rounded-xl border text-center text-xs text-slate-400">कोई लाभार्थी पंजीकृत नहीं है।</div>';
-        return;
-      }
-      listEl.innerHTML = data.map(b => `
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center text-xs">
-          <div>
-            <h4 class="font-bold text-slate-800">${b.full_name}</h4>
-            <p class="text-slate-500 mt-0.5">📍 ${b.village_ward || '-'} • ${b.gender || '-'} (${b.age || '-'} वर्ष)</p>
-            <p class="text-[10px] text-emerald-700 font-medium">🎓 ${b.projects?.project_name || 'सामान्य'}</p>
-          </div>
-          <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">सक्रिय</span>
-        </div>
-      `).join('');
-    }
-
-    async function loadExpensesList() {
-      if (!supabaseClient) return;
-      const listEl = document.getElementById('expenses-list');
-      const { data, error } = await supabaseClient.from('expenses').select('*').order('created_at', { ascending: false });
-      if (error || !data || data.length === 0) {
-        listEl.innerHTML = '<div class="bg-white p-4 rounded-xl border text-center text-xs text-slate-400">कोई खर्च रिकॉर्ड नहीं मिला।</div>';
-        return;
-      }
-      listEl.innerHTML = data.map(e => `
-        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center text-xs">
-          <div>
-            <h4 class="font-bold text-slate-800">${e.category}</h4>
-            <p class="text-slate-500 text-[10px] mt-0.5">${e.notes || 'संस्था खर्च'}</p>
-          </div>
-          <span class="font-bold text-rose-600 text-sm">-₹${Number(e.amount).toLocaleString('en-IN')}</span>
-        </div>
-      `).join('');
-    }
-
-    async function handleDonationSubmit(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submit-btn');
-      btn.innerText = 'सेव हो रहा है...'; btn.disabled = true;
-      try {
-        const name = document.getElementById('donor-name').value.trim();
-        const phone = document.getElementById('donor-phone').value.trim();
-        const city = document.getElementById('donor-city').value.trim();
-        const amount = document.getElementById('donation-amount').value;
-        const mode = document.getElementById('donation-mode').value;
-        const projectId = document.getElementById('donation-project').value || null;
-        const ref = document.getElementById('donation-ref').value.trim();
-
-        const { data: donor, error: dErr } = await supabaseClient.from('donors').insert([{ name, phone, city }]).select().single();
-        if (dErr) throw dErr;
-
-        const { error: donErr } = await supabaseClient.from('donations').insert([{
-          donor_id: donor.id, project_id: projectId, amount: parseFloat(amount), payment_mode: mode, transaction_ref: ref
-        }]);
-        if (donErr) throw donErr;
-
-        const selectedProj = cachedProjects.find(p => p.id === projectId);
-        lastReceiptData = {
-          id: 'MVS-' + Math.floor(100000 + Math.random() * 900000),
-          date: new Date().toLocaleDateString('en-IN'),
-          name, phone,
-          project: selectedProj ? selectedProj.project_name : 'सामान्य कोष (General Fund)',
-          amount: parseFloat(amount), mode
-        };
-
-        document.getElementById('rec-id').innerText = lastReceiptData.id;
-        document.getElementById('rec-date').innerText = lastReceiptData.date;
-        document.getElementById('rec-name').innerText = lastReceiptData.name;
-        document.getElementById('rec-project').innerText = lastReceiptData.project;
-        document.getElementById('rec-mode').innerText = lastReceiptData.mode;
-        document.getElementById('rec-amount').innerText = `₹${lastReceiptData.amount.toLocaleString('en-IN')}`;
-
-        document.getElementById('donation-form').reset();
-        closeModal('donation-modal');
-        openModal('receipt-modal');
-        showStatus('दान सफलतापूर्वक सुरक्षित हुआ!', 'success');
-        loadAllData();
-      } catch (err) {
-        showStatus('त्रुटि: ' + err.message, 'error');
-      } finally {
-        btn.innerText = 'दान सुरक्षित करें और रसीद बनाएं'; btn.disabled = false;
-      }
-    }
-
-    async function handleBeneficiarySubmit(e) {
-      e.preventDefault();
-      const btn = document.getElementById('ben-submit-btn');
-      btn.innerText = 'सेव हो रहा है...'; btn.disabled = true;
-      try {
-        const full_name = document.getElementById('ben-name').value.trim();
-        const gender = document.getElementById('ben-gender').value;
-        const age = document.getElementById('ben-age').value || null;
-        const village_ward = document.getElementById('ben-location').value.trim();
-        const project_id = document.getElementById('ben-project').value || null;
-
-        const { error } = await supabaseClient.from('beneficiaries').insert([{
-          full_name, gender, age: age ? parseInt(age) : null, village_ward, project_id
-        }]);
-        if (error) throw error;
-
-        document.getElementById('beneficiary-form').reset();
-        closeModal('beneficiary-modal');
-        showStatus('लाभार्थी सफलतापूर्वक जोड़ा गया!', 'success');
-        loadAllData();
-        loadBeneficiariesList();
-      } catch (err) {
-        showStatus('त्रुटि: ' + err.message, 'error');
-      } finally {
-        btn.innerText = 'लाभार्थी सुरक्षित करें'; btn.disabled = false;
-      }
-    }
-
-    async function handleExpenseSubmit(e) {
-      e.preventDefault();
-      const btn = document.getElementById('exp-submit-btn');
-      btn.innerText = 'सेव हो रहा है...'; btn.disabled = true;
-      try {
-        const category = document.getElementById('exp-category').value;
-        const amount = document.getElementById('exp-amount').value;
-        const notes = document.getElementById('exp-notes').value.trim();
-
-        const { error } = await supabaseClient.from('expenses').insert([{
-          category, amount: parseFloat(amount), notes
-        }]);
-        if (error) throw error;
-
-        document.getElementById('expense-form').reset();
-        closeModal('expense-modal');
-        showStatus('खर्च सफलतापूर्वक दर्ज हुआ!', 'success');
-        loadAllData();
-        loadExpensesList();
-      } catch (err) {
-        showStatus('त्रुटि: ' + err.message, 'error');
-      } finally {
-        btn.innerText = 'खर्च सुरक्षित करें'; btn.disabled = false;
-      }
-    }
-
-    function shareOnWhatsApp() {
-      if (!lastReceiptData) return;
-      const text = encodeURIComponent(
-        `*मानव विकास संस्थान (MVS NGO)*\nदान प्राप्ति रसीद / Donation Receipt\n--------------------------\nरसीद: ${lastReceiptData.id}\nदानदाता: ${lastReceiptData.name}\nराशि: ₹${lastReceiptData.amount.toLocaleString('en-IN')}\nमाध्यम: ${lastReceiptData.mode}\nप्रोजेक्ट: ${lastReceiptData.project}\nदिनांक: ${lastReceiptData.date}\n--------------------------\nशिक्षा एवं महिला सशक्तिकरण में आपके सहयोग हेतु धन्यवाद!`
-      );
-      const phoneParam = lastReceiptData.phone ? `phone=91${lastReceiptData.phone.replace(/[^0-9]/g, '')}&` : '';
-      window.open(`https://api.whatsapp.com/send?${phoneParam}text=${text}`, '_blank');
-    }
-  </script>
-</body>
-</html>
+        <!-- रसीद विवरण -->
+        <div class="space-y-1 text-[11px]">
+          <div class="flex justify-between"><span class="text-slate-500">रसीद संख्या (Receipt No):</span> <span class="font-bold text-blue-900" id="rec-id">-</span></div>
+          <div class="flex justify-between"><span class="text-slate-500">दिनांक (Date):</span> <span id="rec-date">-</span></div>
+          <div
