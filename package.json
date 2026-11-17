@@ -1,0 +1,23 @@
+{
+  "name": "mvs-ngo-manager",
+  "version": "1.0.0",
+  "description": "NGO Management System for Manav Vikas Sansthan",
+  "main": "index.html",
+  "scripts": {
+    "build": "esbuild analytics.js --bundle --format=esm --outfile=analytics.bundle.js",
+    "test": "echo \"No tests configured\" && exit 0"
+  },
+  "keywords": [
+    "ngo",
+    "management",
+    "manav-vikas-sansthan"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
